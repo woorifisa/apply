@@ -19,6 +19,7 @@ public class KakaoController {
         log.info("인가 코드를 이용하여 토큰을 받습니다. code: " + code);
         System.out.println("code: " + code);
         String accessToken = kakaoService.getKakaoAccessToken(code);
+        kakaoService.getKakaoUserInfo(accessToken);
         return "okay";
     }
 

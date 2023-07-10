@@ -69,4 +69,50 @@ public class KakaoService {
         return accessToken;
     }
 
+    @Transactional
+    public KakaoUserInfo getKakaoUserInfo(String token) {
+
+        String reqURL = "https://kapi.kakao.com/v2/user/me";
+        KakaoUserInfo kakaoUserInfo = new KakaoUserInfo();
+
+        //access_token을 이용하여 사용자 정보 조회
+        try {
+            URL url = new URL(reqURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("GET");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Authorization", "Bearer " + token); //전송할 header 작성, access_token전송
+
+            //결과 코드가 200이라면 성공
+            int responseCode = conn.getResponseCode();
+            log.info("responseCode : " + responseCode);
+
+            //요청을 통해 얻은 JSON타입의 Response 메세지 읽어오기
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line = "";
+            String result = "";
+
+            while ((line = br.readLine()) != null) {
+                result += line;
+            }
+            System.out.println("response body : " + result);
+            //Gson 라이브러리로 JSON파싱
+            JsonParser parser = new JsonParser();
+            JsonElement element = parser.parse(result);
+            JsonElement kakaoAccount = element.getAsJsonObject().get("kakao_account");
+            JsonElement profile = kakaoAccount.getAsJsonObject().get("profile");
+
+            //dto에 저장하기
+            kakaoUserInfo.setId(element.getAsJsonObject().get("id").getAsLong());
+            kakaoUserInfo.setProfileImgUrl(profile.getAsJsonObject().get("profile_image_url").getAsString());
+            kakaoUserInfo.setEmail(kakaoAccount.getAsJsonObject().get("email").getAsString());
+
+            log.info(kakaoUserInfo.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return kakaoUserInfo;
+    }
 }
