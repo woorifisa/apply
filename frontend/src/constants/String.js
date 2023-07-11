@@ -3,15 +3,15 @@ export const HEADER = {
   CONTENTS: [
     {
       TEXT: '교육과정',
-      LINK: '/'
+      LINK: '/course'
     },
     {
       TEXT: '지원하기',
-      LINK: '/'
+      LINK: '/recruit'
     },
     {
       TEXT: '문의하기(FnQ)',
-      LINK: '/'
+      LINK: '/contact'
     }
   ],
   LOGIN: '로그인'
@@ -37,15 +37,15 @@ export const FOOTER = {
     CONTENTS: [
       {
         TITLE: '우리 FISA 소개',
-        LINK: ''
+        LINK: '/'
       },
       {
         TITLE: '교육과정 소개',
-        LINK: ''
+        LINK: '/course'
       },
       {
         TITLE: '문의처',
-        LINK: ''
+        LINK: '/contact'
       }
     ]
   }
