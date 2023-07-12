@@ -4,6 +4,8 @@ import com.apply.oauth.dto.KakaoUserInfo;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,30 +13,45 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
 @Service
 @Slf4j
 public class KakaoService {
+
+    @Value("${social.kakao.url.token}")
+    private String tokenUrl;
+
+    @Value("${social.kakao.url.profile}")
+    private String profileUrl;
+
+    @Value("${social.kakao.client_id}")
+    private String clientId;
+
+    @Value("${social.kakao.url.redirect}")
+    private String redirectUrl;
+
+    public KakaoService() {
+    }
 
     @Transactional
     public String getKakaoAccessToken(String code) {
 
         String accessToken = "";
-        String reqURL = "https://kauth.kakao.com/oauth/token";
 
         try {
-            URL url = new URL(reqURL);
+            URL url = new URL(tokenUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             // POST 요청을 위해 기본값이 false인 setDoOutput을 true로 설정
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
 
-            // POST 요처에 필요로 요구하는 파라미터를 스트림을 통해 전송
+            // POST 요청에 필요로 요구하는 파라미터를 스트림을 통해 전송
             BufferedWriter bw = new BufferedWriter((new OutputStreamWriter(conn.getOutputStream())));
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
-            sb.append("&client_id={id}");
-            sb.append("&redirect_uri={redirectUrl}");
+            sb.append("&client_id=" + clientId);
+            sb.append("&redirect_uri=" + redirectUrl);
             sb.append("&code=" + code);
             bw.write(sb.toString());
             bw.flush();
@@ -72,12 +89,11 @@ public class KakaoService {
     @Transactional
     public KakaoUserInfo getKakaoUserInfo(String token) {
 
-        String reqURL = "https://kapi.kakao.com/v2/user/me";
         KakaoUserInfo kakaoUserInfo = new KakaoUserInfo();
 
         //access_token을 이용하여 사용자 정보 조회
         try {
-            URL url = new URL(reqURL);
+            URL url = new URL(profileUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("GET");
